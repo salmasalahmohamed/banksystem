@@ -13,6 +13,24 @@ class transferData
     private float|int $amount;
     private string $status;
     private string $reference;
+    public function __construct(
+        int $sender,
+        int $sender_account_id,
+        int $recepient_id,
+        int $recepient_account_id,
+        float|int $amount,
+        string $status,
+        string $reference
+    ) {
+        $this->sender              = $sender;
+        $this->sender_account_id   = $sender_account_id;
+        $this->recepient_id        = $recepient_id;
+        $this->recepient_account_id= $recepient_account_id;
+        $this->amount              = $amount;
+        $this->status              = $status;
+        $this->reference           = $reference;
+    }
+
 
     /**
      * @return int|null

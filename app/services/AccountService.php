@@ -182,14 +182,9 @@ $this->accountExist($receiverAccountQuery);
             $depositDto->setDescription($description);
             $transactionDeposit = new transactionData($accountreceiverData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
 
-$transfer=new transferData();
-$transfer->setReference($this->transactionService->generateReference());
-$transfer->setSender($accountsenderData->getUserId());
-$transfer->setSenderAccountId($accountsenderData->getId());
-            $transfer->setRecepientId($accountreceiverData->getId());
-            $transfer->setRecepientAccountId($accountreceiverData->getUserId());
-            $transfer->setAmount($amount);
-            $transfer->setStatus('success');
+$transfer=new transferData($accountsenderData->getUserId(),$accountsenderData->getId(),$accountreceiverData->getId(),$accountreceiverData->getUserId(),$amount,'status',$this->transactionService->generateReference(),);
+
+
             $transferData=$this->transferService->createTransfer($transfer);
 $transactionWithdraw->setTransfareId($transferData->id);
             $transactionDeposit->setTransfareId($transferData->id);
