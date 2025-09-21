@@ -18,8 +18,12 @@ class WithdrawController extends Controller
     {
         $this->accountService = $accountService;
     }
-    public function store(withdrawRequest$request){
-        $account=$this->accountService->grtAccountNumberByUserId($request->user()->id);
+
+    /**
+     * @throws \App\Exceptions\InvalidPinException
+     */
+    public function store(withdrawRequest $request){
+        $account=$this->accountService->getAccountNumberByUserId($request->user()->id);
         $data=new withdrawData();
         $data->setAccountNumber($account->account_number);
         $data->setAmount($request->amount);

@@ -38,17 +38,21 @@ class AccountService implements AccountServiceInterface
         return Account::query();
     }
 
-    public function createAccountNumber($userdata,$id)
+    /**
+     * @throws AccountNumberExists
+     */
+    public function createAccountNumber($userdata, $id)
     {
         if ($this->userService->hasAccountNumber(Auth::user())){
             throw new AccountNumberExists();
         }
         return $this->modelQuery()->create([
-'account_number'=>substr($userdata,-10),
+            'account_number'=>substr($userdata,-10),
             'user_id'=>$id
         ]);
 
     }
+
 
     public function getAccountNumberByAccountId($accountnumber)
     {
@@ -69,25 +73,25 @@ class AccountService implements AccountServiceInterface
         // TODO: Implement getAccount() method.
     }
 
-    public function deposit(DepositData $depositDto): Account
+    public function deposit(DepositData $depositDto)
     {
-        $minimum_deposit=500;
-         if($depositDto->getAmount()<$minimum_deposit){
-                throw new Amounttolow();
-                                 }
+        $minimum_deposit = 500;
+        if ($depositDto->getAmount() < $minimum_deposit) {
+            throw new Amounttolow();
+        }
         try {
-             DB::beginTransaction();
-           $accountquary=$this->modelQuery()->where('account_number',$depositDto->getAccountNumber());
-           $this->accountExist($accountquary);
-           $lockedAccount=$accountquary->lockForUpdate()->first();
-           $accountData=AccountData::fromModel($lockedAccount);
-           $transaction= new transactionData();
-           $transaction->forDeposit($accountData,$this->transactionService,$depositDto->getAmount(),$depositDto->getDescription());
-           event(new DepositEvent($transaction,$accountData,$lockedAccount));
-           DB::commit();
-        }catch (\Exception $exception){
-DB::rollBack();
-throw $exception;
+            DB::beginTransaction();
+            $accountquary = $this->modelQuery()->where('account_number', $depositDto->getAccountNumber());
+            $this->accountExist($accountquary);
+            $lockedAccount = $accountquary->lockForUpdate()->first();
+            $accountData = AccountData::fromModel($lockedAccount);
+            $transaction = new transactionData();
+            $transaction->forDeposit($accountData, $this->transactionService->generateReference(), $depositDto->getAmount(), $depositDto->getDescription());
+            event(new DepositEvent($transaction, $accountData, $lockedAccount));
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
         }
 
     }
@@ -101,6 +105,12 @@ throw $exception;
             throw new InvalidAccountNumberException();
         }
     }
+
+    /**
+     * @throws InvalidPinException
+     * @throws InvalidAccountNumberException
+     * @throws InsufficientBalanceException
+     */
     public function withdraw(withdrawData $withdrawData){
         try {
             DB::beginTransaction();
@@ -108,7 +118,7 @@ throw $exception;
             $this->accountExist($accountquary);
             $lockedAccount=$accountquary->lockForUpdate()->first();
             $accountData=AccountData::fromModel($lockedAccount);
-            if ($this->userService->validatePin($accountData->getUserId(),$withdrawData->getPin())){
+            if (!$this->userService->validatePin($accountData->getUserId(),$withdrawData->getPin())){
                 throw new InvalidPinException();
             }
             $this->canwithdraw($accountData,$withdrawData);
@@ -124,7 +134,11 @@ throw $exception;
             throw $exception;
         }
     }
-    public function  canwithdraw( AccountData $accountData, withdrawData $withdrawData){
+
+    /**
+     * @throws InsufficientBalanceException
+     */
+    public function  canwithdraw(AccountData $accountData, withdrawData $withdrawData){
 
         if ($accountData->getBalance()<$withdrawData->getAmount()){
             throw new InsufficientBalanceException();
@@ -132,12 +146,14 @@ throw $exception;
         return true;
     }
 
-    public function transfer(string $senderAccountNumber, string $receiverAccountNumber, string $senderAccountPin,int $amount, string $description)
+    /**
+     * @throws \Exception
+     */
+    public function transfer(string $senderAccountNumber, string $receiverAccountNumber, string $senderAccountPin, int $amount, string $description)
     {
         if ($senderAccountNumber==$receiverAccountNumber){
             throw  new \Exception(' sender and receiver can not be same');
         }
-        $minimum_withdrawal=300;
         try {
             DB::beginTransaction();
             $senderAccountQuery=$this->modelQuery()->where('account_number',$senderAccountNumber);
@@ -166,7 +182,7 @@ $this->accountExist($receiverAccountQuery);
             $depositDto->setAmount($amount);
             $depositDto->setDescription($description);
 
-            $transactionDeposit=$transaction->forDeposit($accountreceiverData,$this->transactionService,$depositDto->getAmount(),$depositDto->getDescription());
+            $transactionDeposit=$transaction->forDeposit($accountreceiverData,$this->transactionService->generateReference(),$depositDto->getAmount(),$depositDto->getDescription());
 $transfer=new transferData();
 $transfer->setReference($this->transactionService->generateReference());
 $transfer->setSender($accountsenderData->getUserId());

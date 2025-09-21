@@ -23,7 +23,7 @@ public function generateReference(){
 
     public function createTransaction(\App\Data\transactionData $transactiondata)
     {
-        $transaction=Transaction::query()->create([
+        return Transaction::query()->create([
             'user_id'=>$transactiondata->getUserId(),
            'account_id'=>$transactiondata->getAccountId(),
             'reference'=>$transactiondata->getReference(),
@@ -32,9 +32,8 @@ public function generateReference(){
             'description'=>$transactiondata->getDescription(),
 
         ]);
-
-        return $transaction;
     }
+
 
     public function updateTransactionBalance($reference,$balance)
     {
@@ -50,7 +49,7 @@ public function generateReference(){
         ]) ;
     }
     public function getTransactionByUserId($userId,Builder $builder){
-        return $transaction= $builder->where('user_id',$userId);
+        return  $builder->where('user_id',$userId);
 
     }
     public function getTransactionById($transactionId){

@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('category');
             $table->string('confirmed')->default(0);
             $table->string('description')->nullable();
-$table->dateTime('date');
-$table->text('metal')->nullable();
+            $table->dateTime('date');
+            $table->text('metal')->nullable();
 
             $table->softDeletes();
 

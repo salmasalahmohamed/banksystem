@@ -24,7 +24,7 @@ private  int $account_id;
     private  bool $confirmed;
 
 public function forDeposit(AccountData $accountData, $reference,float $amount,$description){
-    $data= new transactionData();
+    $data= new self();
     $data->setUserId($accountData->getUserId());
     $data->setReference($reference);
     $data->setAccountId($accountData->getId());
@@ -35,7 +35,7 @@ public function forDeposit(AccountData $accountData, $reference,float $amount,$d
     return $data;
 }
     public function forWithdrawal(AccountData $accountData, $reference,withdrawData $withdrawData){
-        $data= new transactionData();
+        $data= new self();
         $data->setUserId($accountData->getUserId());
         $data->setReference($reference);
         $data->setTransfareId(null);
@@ -58,7 +58,8 @@ public function forDeposit(AccountData $accountData, $reference,float $amount,$d
  */public function setConfirmed(bool $confirmed): void
 {
     $this->confirmed = $confirmed;
-}/**
+}
+/**
  * @return Carbon
  */public function getDate(): Carbon
 {

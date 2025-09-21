@@ -36,7 +36,8 @@ class userService
         $user->pin=Hash::make($pin);
 $user->save();
     }
-    public function validatePin($user_id,$pin){
+    public function validatePin($user_id,$pin): bool
+    {
         $user=$this->getUserById($user_id);
         if( !$this->hasSetPin($user)){
             throw new  BadRequestException('set ur pin');

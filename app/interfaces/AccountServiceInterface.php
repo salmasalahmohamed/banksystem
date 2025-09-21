@@ -14,7 +14,7 @@ public function createAccountNumber($userdata,$id);
 public function getAccountNumberByAccountId($accountnumber);
 public function getAccountNumberByUserId($userid);
 public function getAccount($accountnumber);
-public function deposit(DepositData $depositDto):Account;
+public function deposit(DepositData $depositDto);
 public function withdraw( withdrawData $withdrawData);
 public function  transfer( string $senderAccountNumber, string $receiverAccountNumber, string $senderAccountPin, int $amount, string $description);
 

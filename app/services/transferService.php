@@ -20,7 +20,7 @@ return Transfer::query();
 
     public function createTransfer(transferData $transferData)
     {
-        $transfer=$this->modelQuery()->create([
+        return $this->modelQuery()->create([
            'sender_id'=>$transferData->getSender(),
             'receiver_id'=>$transferData->getRecepientId(),
             'sender_account_id'=>$transferData->getSenderAccountId(),
