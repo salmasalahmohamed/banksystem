@@ -76,7 +76,7 @@ class AccountData
      public static function fromModel(Account $account){
 $data=new self();
 $data->setId($account->id);
-$data->setAccountNumber($account->account_number);
+$data->setAccountNumber($account->id);
 $data->setBalance($account->balance);
 $data->setUserId($account->user_id);
 return $data;

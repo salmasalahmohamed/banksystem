@@ -24,12 +24,12 @@ class AccountService implements AccountServiceInterface
 {
     public userService $userService;
     public TransactionService $transactionService;
-    public TransferServiceInterface $transferService;
+    public transferService $transferService;
 
-    public function __construct(userService $userService, TransactionService $transactionService,TransferServiceInterface $transferService)
+    public function __construct(userService $userService, TransactionService $transactionService,transferService $transferService)
 {
     $this->userService = $userService;
-    $this->$transactionService=$transactionService;
+    $this->transactionService=$transactionService;
     $this-> transferService=$transferService;
 }
 
@@ -81,12 +81,12 @@ class AccountService implements AccountServiceInterface
         }
         try {
             DB::beginTransaction();
-            $accountquary = $this->modelQuery()->where('account_number', $depositDto->getAccountNumber());
+            $accountquary = $this->modelQuery()->where('id', $depositDto->getAccountNumber());
             $this->accountExist($accountquary);
             $lockedAccount = $accountquary->lockForUpdate()->first();
             $accountData = AccountData::fromModel($lockedAccount);
-            $transaction = new transactionData();
-            $transaction->forDeposit($accountData, $this->transactionService->generateReference(), $depositDto->getAmount(), $depositDto->getDescription());
+            $transaction = new transactionData($accountData->getAccountNumber(),$accountData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
+
             event(new DepositEvent($transaction, $accountData, $lockedAccount));
             DB::commit();
         } catch (\Exception $exception) {
@@ -122,10 +122,9 @@ class AccountService implements AccountServiceInterface
                 throw new InvalidPinException();
             }
             $this->canwithdraw($accountData,$withdrawData);
-            $transaction= new transactionData();
+            $transaction = new transactionData($accountData->getAccountNumber(),$accountData->getUserId(),$withdrawData->getAmount(),$this->transactionService->generateReference(),'withdraw');
 
-            $transaction->forWithdrawal($accountData,$this->transactionService->generateReference(),
-                $withdrawData);
+
             event(new WithdrawlEvent($transaction,$accountData,$lockedAccount));
             DB::commit();
             return $transaction;
@@ -168,21 +167,21 @@ $this->accountExist($receiverAccountQuery);
             if ($this->userService->validatePin($accountsenderData->getUserId(),$senderAccountPin)){
                 throw new InvalidPinException();
             }
-            $transaction= new transactionData();
             $withdrawData= $data=new withdrawData();
             $data->setAccountNumber($accountsenderData->getAccountNumber());
             $data->setAmount($amount);
             $data->setDescription($description);
             $data->setPin($senderAccountPin);
-            $transactionWithdraw=$transaction->forWithdrawal($accountsenderData,$this->transactionService->generateReference(),
-                $withdrawData);
+            $transactionWithdraw = new transactionData($accountsenderData->getUserId(),$withdrawData->getAmount(),$this->transactionService->generateReference(),'withdraw');
+
+
             $this->canwithdraw($accountsenderData,$withdrawData);
             $depositDto=new DepositData();
             $depositDto->setAccountNumber($accountreceiverData->getAccountNumber());
             $depositDto->setAmount($amount);
             $depositDto->setDescription($description);
+            $transactionDeposit = new transactionData($accountreceiverData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
 
-            $transactionDeposit=$transaction->forDeposit($accountreceiverData,$this->transactionService->generateReference(),$depositDto->getAmount(),$depositDto->getDescription());
 $transfer=new transferData();
 $transfer->setReference($this->transactionService->generateReference());
 $transfer->setSender($accountsenderData->getUserId());

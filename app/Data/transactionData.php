@@ -4,16 +4,17 @@ namespace App\Data;
 
 use App\Enum\TransactionCategoryEnum;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class transactionData
 {
+    public ?int $account_id = null;
+    public ?int $user_id = null;
+    public ?float $amount = null;
 private  int $id;
 private string $reference;
-private  int $account_id;
-    private  int $transfare_id;
+    private  int $transfare_id=0;
 
-    private  int $user_id;
-    private float $amount;
         private float $balance;
 
     private  string $category;
@@ -23,29 +24,49 @@ private  int $account_id;
     private Carbon $date;
     private  bool $confirmed;
 
-public function forDeposit(AccountData $accountData, $reference,float $amount,$description){
-    $data= new self();
-    $data->setUserId($accountData->getUserId());
-    $data->setReference($reference);
-    $data->setAccountId($accountData->getId());
-    $data->setAmount($amount);
-    $data->setCategory(TransactionCategoryEnum::DEPOSIT->value);
-    $data->setDate(Carbon::now());
-    $data->setDescription($description);
-    return $data;
-}
-    public function forWithdrawal(AccountData $accountData, $reference,withdrawData $withdrawData){
-        $data= new self();
-        $data->setUserId($accountData->getUserId());
-        $data->setReference($reference);
-        $data->setTransfareId(null);
-        $data->setAccountId($accountData->getId());
-        $data->setAmount($withdrawData->getAmount());
-        $data->setCategory($withdrawData->getCategory());
-        $data->setDate(Carbon::now());
-        $data->setDescription($withdrawData->getDescription());
-        return $data;
+    public function __construct(
+        int $account_id,
+        int $user_id,
+        float $amount,
+        string $reference = '',
+
+        string $category = 'general',
+        string $description = '',
+        ?Carbon $date = null,
+    ) {
+        $this->account_id   = $account_id;
+        $this->user_id      = $user_id??Auth::user()->id;
+        $this->amount       = $amount;
+        $this->reference    = $reference;
+        $this->category     = $category;
+        $this->description  = $description;
+        $this->date         = $date ?? Carbon::now();
     }
+//
+//public function forDeposit(AccountData $accountData, $reference,float $amount,$description){
+//    $data= new transactionData();
+//
+//    $data->setUserId($accountData->getUserId());
+//    $data->setReference($reference);
+//    $data->setAccountId($accountData->getId());
+//    $data->setAmount($amount);
+//    $data->setCategory(TransactionCategoryEnum::DEPOSIT->value);
+//    $data->setDate(Carbon::now());
+//    $data->setDescription($description);
+//    return $data;
+//}
+//    public function forWithdrawal(AccountData $accountData, $reference,withdrawData $withdrawData){
+//        $data= new self();
+//        $data->setUserId($accountData->getUserId());
+//        $data->setReference($reference);
+//        $data->setTransfareId(null);
+//        $data->setAccountId($accountData->getId());
+//        $data->setAmount($withdrawData->getAmount());
+//        $data->setCategory($withdrawData->getCategory());
+//        $data->setDate(Carbon::now());
+//        $data->setDescription($withdrawData->getDescription());
+//        return $data;
+//    }
 
 
 /**
@@ -121,10 +142,13 @@ public function forDeposit(AccountData $accountData, $reference,float $amount,$d
     $this->amount = $amount;
 }/**
  * @return int
- */public function getUserId(): int
+ */
+
+public function getUserId(): int
 {
     return $this->user_id;
-}/**
+}
+/**
  * @param int $user_id
  */public function setUserId(int $user_id): void
 {

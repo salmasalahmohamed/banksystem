@@ -5,6 +5,7 @@ namespace App\services;
 use App\Enum\TransactionCategoryEnum;
 use App\Models\Transaction;
 use App\Models\Transfer;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
@@ -23,13 +24,16 @@ public function generateReference(){
 
     public function createTransaction(\App\Data\transactionData $transactiondata)
     {
+
         return Transaction::query()->create([
-            'user_id'=>$transactiondata->getUserId(),
+
+        'user_id'=>$transactiondata->getUserId(),
            'account_id'=>$transactiondata->getAccountId(),
             'reference'=>$transactiondata->getReference(),
             'category'=>$transactiondata->getCategory(),
             'date'=>$transactiondata->getDate(),
             'description'=>$transactiondata->getDescription(),
+            'amount'=>$transactiondata->amount,
 
         ]);
     }

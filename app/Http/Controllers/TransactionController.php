@@ -17,7 +17,7 @@ class TransactionController extends Controller
         $transactionBuilder=$this->transactionService->modelQuery()->when($request->category,function ($q) use($request){
             $q->where('category',$request->category);
         });
-        $builder=$this->transactionService->getTransactionByUserId($request->user()->id,$transactionBuilder);
+        $this->transactionService->getTransactionByUserId($request->user()->id,$transactionBuilder);
         return $this->sendResponse(['transaction'=>$transactionBuilder->paginate()]);
 
     }

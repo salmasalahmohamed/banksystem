@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id();
+            $table->id()->bigInteger();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('account_number')->unique();
             $table->decimal('balance',16,4)->default(0);
             $table->softDeletes();
             $table->timestamps();
