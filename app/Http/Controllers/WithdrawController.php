@@ -25,7 +25,7 @@ class WithdrawController extends Controller
     public function store(withdrawRequest $request){
         $account=$this->accountService->getAccountNumberByUserId($request->user()->id);
         $data=new withdrawData();
-        $data->setAccountNumber($account->account_number);
+        $data->setAccountNumber($account->id);
         $data->setAmount($request->amount);
         $data->setDescription($request->description);
         $data->setPin($request->pin);

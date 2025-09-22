@@ -47,7 +47,7 @@ class AccountService implements AccountServiceInterface
             throw new AccountNumberExists();
         }
         return $this->modelQuery()->create([
-            'account_number'=>substr($userdata,-10),
+            'id'=>$userdata,
             'user_id'=>$id
         ]);
 
@@ -114,7 +114,7 @@ class AccountService implements AccountServiceInterface
     public function withdraw(withdrawData $withdrawData){
         try {
             DB::beginTransaction();
-            $accountquary=$this->modelQuery()->where('account_number',$withdrawData->getAccountNumber());
+            $accountquary=$this->modelQuery()->where('id',$withdrawData->getAccountNumber());
             $this->accountExist($accountquary);
             $lockedAccount=$accountquary->lockForUpdate()->first();
             $accountData=AccountData::fromModel($lockedAccount);
@@ -155,8 +155,8 @@ class AccountService implements AccountServiceInterface
         }
         try {
             DB::beginTransaction();
-            $senderAccountQuery=$this->modelQuery()->where('account_number',$senderAccountNumber);
-            $receiverAccountQuery=$this->modelQuery()->where('account_number',$receiverAccountNumber);
+            $senderAccountQuery=$this->modelQuery()->where('id',$senderAccountNumber);
+            $receiverAccountQuery=$this->modelQuery()->where('id',$receiverAccountNumber);
 $this->accountExist($senderAccountQuery);
 $this->accountExist($receiverAccountQuery);
             $lockedSenderAccount=$senderAccountQuery->lockForUpdate()->first();
@@ -182,7 +182,7 @@ $this->accountExist($receiverAccountQuery);
             $depositDto->setDescription($description);
             $transactionDeposit = new transactionData($accountreceiverData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
 
-$transfer=new transferData($accountsenderData->getUserId(),$accountsenderData->getId(),$accountreceiverData->getId(),$accountreceiverData->getUserId(),$amount,'status',$this->transactionService->generateReference(),);
+$transfer=new transferData($accountsenderData->getUserId(),$accountsenderData->getId(),$accountreceiverData->getId(),$accountreceiverData->getUserId(),$amount,'status',$this->transactionService->generateReference());
 
 
             $transferData=$this->transferService->createTransfer($transfer);
