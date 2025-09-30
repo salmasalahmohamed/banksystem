@@ -27,6 +27,7 @@ class DepositListener
         if ($event->transaction->getCategory()!=TransactionCategoryEnum::DEPOSIT->value){
             return;
         }
+
         $this->transactionService->createTransaction($event->transaction);
         $account=$event->lockedAccount;
         $account->balance=$account->balance+$event->transaction->getAmount();
@@ -37,6 +38,7 @@ class DepositListener
             $this->transactionService->updateTransferId($event->transaction->getReference(),$event->transaction->getTransfareId());
 
         }
+
 
     }
 }

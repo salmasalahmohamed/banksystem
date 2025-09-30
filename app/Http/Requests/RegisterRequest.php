@@ -28,7 +28,6 @@ class RegisterRequest extends FormRequest
             'phone' => 'required',
             'pin' => 'required',
 
-            'confirmed_password' => 'required|same:password',
         ];
     }
 }

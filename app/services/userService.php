@@ -12,8 +12,16 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class userService
 {
+    public ?userService $instance=null;
 
+    public  function __construct()
+    {
+    }
     public  function register($data ){
+
+
+
+
 
             $user = User::query()->create($data);
             return $user;
@@ -38,14 +46,20 @@ $user->save();
     }
     public function validatePin($user_id,$pin): bool
     {
+
         $user=$this->getUserById($user_id);
         if( !$this->hasSetPin($user)){
+
             throw new  BadRequestException('set ur pin');
         }
+
         return Hash::check($pin,$user->pin);
+
     }
     public function hasSetPin(User $user){
+
         return $user->pin !=null;
+
     }
     public function hasAccountNumber(User  $user)
     {

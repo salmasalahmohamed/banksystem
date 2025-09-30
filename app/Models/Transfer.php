@@ -17,9 +17,9 @@ class Transfer extends Model
         return $this->belongsTo(User::class,'recipient__id');
     }
     public function senderAccount(){
-        return $this->belongsTo(Account::class,'sender_account_id');
+        return $this->belongsTo(Account::class,'sender_account_id','id','id');
     }
     public function receiverAccount(){
-        return $this->belongsTo(Account::class,'recipient_account_id');
+        return $this->belongsTo(Account::class,'recipient_account_id','id','id');
     }
 }

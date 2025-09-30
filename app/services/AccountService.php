@@ -30,7 +30,7 @@ class AccountService implements AccountServiceInterface
 {
     $this->userService = $userService;
     $this->transactionService=$transactionService;
-    $this-> transferService=$transferService;
+    $this-> transferService=new transferService();
 }
 
     public function modelQuery()
@@ -99,12 +99,7 @@ class AccountService implements AccountServiceInterface
     /**
      * @throws InvalidAccountNumberException
      */
-    private function accountExist(\Illuminate\Database\Eloquent\Builder $accountquary)
-    {
-        if(!$accountquary->exists()){
-            throw new InvalidAccountNumberException();
-        }
-    }
+
 
     /**
      * @throws InvalidPinException
@@ -144,57 +139,75 @@ class AccountService implements AccountServiceInterface
         }
         return true;
     }
+    private function accountExist(\Illuminate\Database\Eloquent\Builder $accountquary)
+    {
 
+        if(!$accountquary->exists()){
+            throw new InvalidAccountNumberException();
+        }
+
+        return true;
+    }
     /**
      * @throws \Exception
      */
-    public function transfer(string $senderAccountNumber, string $receiverAccountNumber, string $senderAccountPin, int $amount, string $description)
+    public function transfer( $senderAccountNumber,  $receiverAccountNumber, string $senderAccountPin, int $amount, string $description)
     {
+
         if ($senderAccountNumber==$receiverAccountNumber){
             throw  new \Exception(' sender and receiver can not be same');
         }
         try {
+
             DB::beginTransaction();
+
             $senderAccountQuery=$this->modelQuery()->where('id',$senderAccountNumber);
             $receiverAccountQuery=$this->modelQuery()->where('id',$receiverAccountNumber);
-$this->accountExist($senderAccountQuery);
-$this->accountExist($receiverAccountQuery);
-            $lockedSenderAccount=$senderAccountQuery->lockForUpdate()->first();
+
+            $this->accountExist($senderAccountQuery);
+
+            $this->accountExist($receiverAccountQuery);
+$lockedSenderAccount=$senderAccountQuery->lockForUpdate()->first();
             $lockedReceiverAccount=$receiverAccountQuery->lockForUpdate()->first();
+
             $accountsenderData=AccountData::fromModel($lockedSenderAccount);
             $accountreceiverData=AccountData::fromModel($lockedReceiverAccount);
 
             if ($this->userService->validatePin($accountsenderData->getUserId(),$senderAccountPin)){
                 throw new InvalidPinException();
             }
+
             $withdrawData= $data=new withdrawData();
             $data->setAccountNumber($accountsenderData->getAccountNumber());
             $data->setAmount($amount);
             $data->setDescription($description);
             $data->setPin($senderAccountPin);
-            $transactionWithdraw = new transactionData($accountsenderData->getUserId(),$withdrawData->getAmount(),$this->transactionService->generateReference(),'withdraw');
+
+             $transactionWithdraw = new transactionData($accountsenderData->getAccountNumber(),$accountsenderData->getUserId(),$withdrawData->getAmount(),$this->transactionService->generateReference(),'withdraw');
 
 
             $this->canwithdraw($accountsenderData,$withdrawData);
             $depositDto=new DepositData();
+
             $depositDto->setAccountNumber($accountreceiverData->getAccountNumber());
             $depositDto->setAmount($amount);
             $depositDto->setDescription($description);
-            $transactionDeposit = new transactionData($accountreceiverData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
+            $transactionDeposit = new transactionData($accountreceiverData->getAccountNumber(),$accountreceiverData->getUserId(),$depositDto->getAmount(),$this->transactionService->generateReference(),'deposit',$depositDto->getDescription());
 
-$transfer=new transferData($accountsenderData->getUserId(),$accountsenderData->getId(),$accountreceiverData->getId(),$accountreceiverData->getUserId(),$amount,'status',$this->transactionService->generateReference());
-
+            $transfer=new transferData($accountsenderData->getUserId(),$accountsenderData->getAccountNumber(),$accountreceiverData->getUserId(),$accountreceiverData->getAccountNumber(),$amount,'status',$this->transactionService->generateReference());
 
             $transferData=$this->transferService->createTransfer($transfer);
-$transactionWithdraw->setTransfareId($transferData->id);
+
+            $transactionWithdraw->setTransfareId($transferData->id);
             $transactionDeposit->setTransfareId($transferData->id);
-
             event(new WithdrawlEvent($transactionWithdraw,$accountsenderData,$lockedSenderAccount));
-            event(new DepositEvent($transactionWithdraw,$accountreceiverData,$lockedReceiverAccount));
+            event(new DepositEvent($transactionDeposit,$accountreceiverData,$lockedReceiverAccount));
             DB::commit();
-
+return true;
         }catch (\Exception $exception){
             DB::rollBack();
+            throw $exception;
+
         }
     }
 }

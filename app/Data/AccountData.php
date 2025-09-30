@@ -9,21 +9,21 @@ class AccountData
 
     private  int $id;
     private int $user_id;
-    private string $account_number;
+    private int $account_number;
     private  float $balance;
 
     /**
      * @param string $account_number
      */
-    public function setAccountNumber(string $account_number): void
+    public function setAccountNumber(int $account_number): void
     {
         $this->account_number = $account_number;
     }
 
     /**
-     * @return string
+     * @return integer
      */
-    public function getAccountNumber(): string
+    public function getAccountNumber(): int
     {
         return $this->account_number;
     }

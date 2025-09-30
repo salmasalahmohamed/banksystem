@@ -9,27 +9,33 @@ use App\Models\Transfer;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use mysql_xdevapi\Exception;
+use phpDocumentor\Reflection\Types\Collection;
 
 class transferService implements TransferServiceInterface
 {
+    public function __construct()
+    {
+    }
 
     public function modelQuery()
     {
-return Transfer::query();
+ Transfer::query();
     }
 
     public function createTransfer(transferData $transferData)
     {
-        return $this->modelQuery()->create([
+         $transfer= Transfer::create([
+
            'sender_id'=>$transferData->getSender(),
-            'receiver_id'=>$transferData->getRecepientId(),
+            'recipient_id'=>$transferData->getRecepientId(),
             'sender_account_id'=>$transferData->getSenderAccountId(),
-            'receiver_account_id'=>$transferData->getRecepientAccountId(),
+            'recipient_account_id'=>$transferData->getRecepientAccountId(),
             'reference'=>$transferData->getReference(),
             'status'=>$transferData->getStatus(),
             'amount'=>$transferData->getAmount(),
 
         ]);
+         return $transfer;
     }
 
     public function getTransferBetweenAccount(AccountData $firstaccountData, AccountData $secondaccountData)

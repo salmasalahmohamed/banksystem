@@ -4,6 +4,6 @@ namespace App\Enum;
 
 enum TransactionCategoryEnum: string
 {
-case WITHDRAW='withdrawal';
+case WITHDRAW='withdraw';
 case DEPOSIT='deposit';
 }
