@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Account;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -20,8 +21,8 @@ class TransferTest extends TestCase
 
 
         $response2 = $this->postJson('/api/accountnumber', ['id'=>$user->id,'userdata'=>999999999]);
-        $receiver_user=User::find(86);
-        $receiver_account=$receiver_user->account;
+        $receiver_user = User::factory()->has(Account::factory())->create();
+        $receiver_account = $receiver_user->account;
         $response3=$this->postJson('/api/transfer', ['receiver_account_number'=>$receiver_account->id,'amount'=>9966,'description'=>'description','pin'=>'password']);
         $response2
             ->assertStatus(200)
