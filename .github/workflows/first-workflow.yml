@@ -49,7 +49,9 @@ jobs:
           echo "QUEUE_CONNECTION=sync" >> .env
 
       - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+#        run:composer update
+
 
       - name: Generate Application Key
         run: php artisan key:generate
