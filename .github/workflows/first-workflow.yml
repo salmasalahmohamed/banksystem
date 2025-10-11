@@ -17,9 +17,9 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: fitness
+          MYSQL_DATABASE: banksystem
           MYSQL_USER: laravel
-          MYSQL_PASSWORD: password
+          MYSQL_PASSWORD:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -41,16 +41,15 @@ jobs:
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=fitness" >> .env
+          echo "DB_DATABASE=banksystem" >> .env
           echo "DB_USERNAME=laravel" >> .env
-          echo "DB_PASSWORD=password" >> .env
+          echo "DB_PASSWORD=" >> .env
           echo "CACHE_DRIVER=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
 
       - name: Install Dependencies
-        run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-#        run:composer update
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
 
       - name: Generate Application Key
