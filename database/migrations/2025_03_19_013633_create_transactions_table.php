@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->string('reference')->index('transactions_reference');
             $table->decimal('amount',16,4);
-            $table->decimal('balance',16,4);
+            $table->decimal('balance',16,4)->default(0);
             $table->string('category');
             $table->string('confirmed')->default(0);
             $table->string('description')->nullable();
