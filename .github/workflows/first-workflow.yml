@@ -19,7 +19,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: banksystem
           MYSQL_USER: laravel
-          MYSQL_PASSWORD:
+          MYSQL_PASSWORD: password
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -43,7 +43,7 @@ jobs:
           echo "DB_PORT=3306" >> .env
           echo "DB_DATABASE=banksystem" >> .env
           echo "DB_USERNAME=laravel" >> .env
-          echo "DB_PASSWORD=" >> .env
+          echo "DB_PASSWORD=password" >> .env
           echo "CACHE_DRIVER=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
