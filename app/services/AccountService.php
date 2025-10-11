@@ -47,7 +47,7 @@ class AccountService implements AccountServiceInterface
             throw new AccountNumberExists();
         }
         return $this->modelQuery()->create([
-            'id'=>$userdata,
+            'balance'=>$userdata,
             'user_id'=>$id
         ]);
 
@@ -114,8 +114,10 @@ class AccountService implements AccountServiceInterface
             $lockedAccount=$accountquary->lockForUpdate()->first();
             $accountData=AccountData::fromModel($lockedAccount);
             if (!$this->userService->validatePin($accountData->getUserId(),$withdrawData->getPin())){
+
                 throw new InvalidPinException();
             }
+
             $this->canwithdraw($accountData,$withdrawData);
             $transaction = new transactionData($accountData->getAccountNumber(),$accountData->getUserId(),$withdrawData->getAmount(),$this->transactionService->generateReference(),'withdraw');
 
@@ -173,7 +175,7 @@ $lockedSenderAccount=$senderAccountQuery->lockForUpdate()->first();
             $accountsenderData=AccountData::fromModel($lockedSenderAccount);
             $accountreceiverData=AccountData::fromModel($lockedReceiverAccount);
 
-            if ($this->userService->validatePin($accountsenderData->getUserId(),$senderAccountPin)){
+            if (!$this->userService->validatePin($accountsenderData->getUserId(),$senderAccountPin)){
                 throw new InvalidPinException();
             }
 

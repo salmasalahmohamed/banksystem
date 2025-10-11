@@ -22,7 +22,7 @@ class DepositRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_number'=>'required|string|min:10',
+            'account_number'=>'required',
             'amount'=>'required|numeric',
             'description'=>'required|string',
 

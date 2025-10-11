@@ -48,6 +48,7 @@ $user->save();
     {
 
         $user=$this->getUserById($user_id);
+
         if( !$this->hasSetPin($user)){
 
             throw new  BadRequestException('set ur pin');

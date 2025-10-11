@@ -25,7 +25,7 @@ class WithdrawController extends Controller
      * @throws \Exception
      */
     public function store(withdrawRequest $request){
-        $user=User::find(1);
+        $user=$request->user();
         $account=$this->accountService->getAccountNumberByUserId($user->id);
         $data=new withdrawData();
         $data->setAccountNumber($account->id);
